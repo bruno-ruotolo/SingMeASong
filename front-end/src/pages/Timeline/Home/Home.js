@@ -8,6 +8,7 @@ import Recommendation from "../../../components/Recommendation";
 
 export default function Home() {
   const { recommendations, loadingRecommendations, listRecommendations } = useRecommendations();
+
   const { loadingCreatingRecommendation, createRecommendation, creatingRecommendationError } = useCreateRecommendation();
 
   const handleCreateRecommendation = async (recommendation) => {
