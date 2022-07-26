@@ -73,6 +73,24 @@ describe("POST /recommendations Suite", () => {
 
 describe("POST /recommendations/:id/upvote SUITE", () => {
   it("given a valid id, return 200 and add a score on database", async () => {
-    await scenarioFactory.upVoteScenario();
+    const recommendation = await scenarioFactory.upVoteScenario();
+    const { id } = recommendation;
+
+    const result = await agent.post(`/recommendations/${id}/upvote`);
+    const status = result.statusCode;
+
+    const createdUpVote = await prisma.recommendation.findUnique({ where: { id } });
+
+    expect(createdUpVote.score).toBeGreaterThan(0);
+    expect(status).toBe(200);
+  });
+
+  it("given a invalid id, return 200 and add a score on database", async () => {
+    const id = Math.floor(Math.random() * 100);
+
+    const result = await agent.get(`/recommendations/${id}/upvote`);
+    const status = result.statusCode;
+
+    expect(status).toBe(404);
   });
 });
