@@ -66,7 +66,7 @@ describe("POST /recommendations Suite", () => {
       where: { name: recommendationBody.name, youtubeLink: recommendationBody.youtubeLink }
     });
 
-    expect(createdRecommendation).toBeNull;
+    expect(createdRecommendation).toBeNull();
     expect(status).toBe(422);
   });
 });
@@ -85,12 +85,52 @@ describe("POST /recommendations/:id/upvote SUITE", () => {
     expect(status).toBe(200);
   });
 
-  it("given a invalid id, return 200 and add a score on database", async () => {
+  it("given a invalid id, return 404", async () => {
     const id = Math.floor(Math.random() * 100);
 
     const result = await agent.get(`/recommendations/${id}/upvote`);
     const status = result.statusCode;
 
     expect(status).toBe(404);
+  });
+});
+
+
+describe("POST /recommendations/:id/downvote SUITE", () => {
+  it("given a valid id, return 200 and remove a score on database", async () => {
+    const recommendation = await scenarioFactory.downVoteScenario();
+    const { id } = recommendation;
+
+    const result = await agent.post(`/recommendations/${id}/downvote`);
+    const status = result.statusCode;
+
+    const createdUpVote = await prisma.recommendation.findUnique({ where: { id } });
+
+    expect(createdUpVote.score).toBeLessThan(0);
+    expect(status).toBe(200);
+  });
+
+  it("given a invalid id, return 404", async () => {
+    const id = Math.floor(Math.random() * 100);
+
+    const result = await agent.get(`/recommendations/${id}/upvote`);
+    const status = result.statusCode;
+
+    expect(status).toBe(404);
+  });
+
+  it("given a valid id and score less then -5, return 200 and remove recommendation", async () => {
+    const recommendation = await scenarioFactory.downVoteScenario(-5);
+    console.log("🚀 ~ file: app.test.ts ~ line 124 ~ it ~ recommendation", recommendation)
+    const { id } = recommendation;
+
+    const result = await agent.post(`/recommendations/${id}/downvote`);
+    const status = result.statusCode;
+
+    const createdUpVote = await prisma.recommendation.findUnique({ where: { id } });
+    console.log("🚀 ~ file: app.test.ts ~ line 131 ~ it ~ createdUpVote", createdUpVote)
+
+    expect(createdUpVote).toBeNull();
+    expect(status).toBe(200);
   });
 });

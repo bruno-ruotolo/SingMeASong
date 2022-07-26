@@ -13,9 +13,15 @@ async function upVoteScenario() {
   return await prisma.recommendation.create({ data: recommendationBody });
 };
 
+async function downVoteScenario(score = 0) {
+  const recommendationBody = recommendationsFactory.createBody();
+  return await prisma.recommendation.create({ data: { ...recommendationBody, score } });
+};
+
 const scenarioFactory = {
   deleteAllData,
-  upVoteScenario
+  upVoteScenario,
+  downVoteScenario
 };
 
 export default scenarioFactory;
