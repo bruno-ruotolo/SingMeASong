@@ -69,11 +69,21 @@ describe("POST /recommendations Suite", () => {
     expect(createdRecommendation).toBeNull();
     expect(status).toBe(422);
   });
+
+  it("given a repeated recommendation name, return 409", async () => {
+    const recommendationBody = recommendationsFactory.createBody();
+    await scenarioFactory.repeatedRecommendationScenario(recommendationBody);
+
+    const result = await agent.post("/recommendations").send(recommendationBody);
+    const status = result.statusCode;
+
+    expect(status).toBe(409);
+  });
 });
 
 describe("POST /recommendations/:id/upvote SUITE", () => {
   it("given a valid id, return 200 and add a score on database", async () => {
-    const recommendation = await scenarioFactory.upVoteScenario();
+    const recommendation = await scenarioFactory.upVoteAndGetByIdScenario();
     const { id } = recommendation;
 
     const result = await agent.post(`/recommendations/${id}/upvote`);
@@ -94,7 +104,6 @@ describe("POST /recommendations/:id/upvote SUITE", () => {
     expect(status).toBe(404);
   });
 });
-
 
 describe("POST /recommendations/:id/downvote SUITE", () => {
   it("given a valid id, return 200 and remove a score on database", async () => {
@@ -121,16 +130,76 @@ describe("POST /recommendations/:id/downvote SUITE", () => {
 
   it("given a valid id and score less then -5, return 200 and remove recommendation", async () => {
     const recommendation = await scenarioFactory.downVoteScenario(-5);
-    console.log("🚀 ~ file: app.test.ts ~ line 124 ~ it ~ recommendation", recommendation)
     const { id } = recommendation;
 
     const result = await agent.post(`/recommendations/${id}/downvote`);
     const status = result.statusCode;
 
     const createdUpVote = await prisma.recommendation.findUnique({ where: { id } });
-    console.log("🚀 ~ file: app.test.ts ~ line 131 ~ it ~ createdUpVote", createdUpVote)
 
     expect(createdUpVote).toBeNull();
+    expect(status).toBe(200);
+  });
+});
+
+describe("GET /recommendations", () => {
+  it("return 200 and the last 10 recommendations", async () => {
+    await scenarioFactory.getAllRecommendationScenario();
+
+    const result = await agent.get(`/recommendations`);
+    const status = result.statusCode;
+
+    expect(result.body).toHaveLength(10);
+    console.log("🚀 ~ file: app.test.ts ~ line 143 ~ it ~ result.body", result.body)
+    expect(status).toBe(200);
+  });
+});
+
+describe("GET /recommendations/:id", () => {
+  it("given a valid id, return 200 and the recommendation", async () => {
+    const recommendation = await scenarioFactory.upVoteAndGetByIdScenario();
+    const { id } = recommendation;
+
+    const result = await agent.get(`/recommendations/${id}`);
+    const status = result.statusCode;
+
+    expect(result.body.name).toBe(recommendation.name);
+    expect(status).toBe(200);
+  });
+
+  it("given a invalid id, return 404", async () => {
+    const id = Math.floor(Math.random() * 100);
+
+    const result = await agent.get(`/recommendations/${id}`);
+    const status = result.statusCode;
+
+    expect(result).toBeNull;
+    expect(status).toBe(404);
+  });
+});
+
+describe("GET /recommendations/top/:amount", () => {
+  it("return 200 and the top {amount} recommendations", async () => {
+    const AMOUNT = 5;
+    await scenarioFactory.getAmountAndRandomScenario();
+
+    const result = await agent.get(`/recommendations/top/${AMOUNT}`);
+    const status = result.statusCode;
+
+    expect(result.body).toHaveLength(AMOUNT);
+    expect(result.body[0].score).toBeGreaterThan(result.body[1].score);
+    expect(status).toBe(200);
+  });
+});
+
+describe("GET /recommendations/random", () => {
+  it("return 200 and a object", async () => {
+    await scenarioFactory.getAmountAndRandomScenario();
+
+    const result = await agent.get(`/recommendations/random`);
+    const status = result.statusCode;
+
+    expect(result).not.toBeNull();
     expect(status).toBe(200);
   });
 });
