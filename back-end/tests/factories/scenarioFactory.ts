@@ -46,5 +46,4 @@ const scenarioFactory = {
   getAmountAndRandomScenario,
   repeatedRecommendationScenario
 };
-
 export default scenarioFactory;
