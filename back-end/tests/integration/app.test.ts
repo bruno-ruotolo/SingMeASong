@@ -1,9 +1,9 @@
-import app from "../src/app.js";
+import app from "../../src/app.js";
 import supertest from "supertest";
 
-import scenarioFactory from "./factories/scenarioFactory.js";
-import recommendationsFactory from "./factories/recommendationsFactory.js";
-import { prisma } from "../src/database.js";
+import scenarioFactory from "../factories/scenarioFactory.js";
+import recommendationsFactory from "../factories/recommendationsFactory.js";
+import { prisma } from "../../src/database.js";
 
 beforeEach(async () => {
   await scenarioFactory.deleteAllData();
@@ -68,16 +68,6 @@ describe("POST /recommendations Suite", () => {
 
     expect(createdRecommendation).toBeNull();
     expect(status).toBe(422);
-  });
-
-  it("given a repeated recommendation name, return 409", async () => {
-    const recommendationBody = recommendationsFactory.createBody();
-    await scenarioFactory.repeatedRecommendationScenario(recommendationBody);
-
-    const result = await agent.post("/recommendations").send(recommendationBody);
-    const status = result.statusCode;
-
-    expect(status).toBe(409);
   });
 });
 
@@ -187,7 +177,7 @@ describe("GET /recommendations/top/:amount", () => {
     const status = result.statusCode;
 
     expect(result.body).toHaveLength(AMOUNT);
-    expect(result.body[0].score).toBeGreaterThan(result.body[1].score);
+    expect(result.body[0].score).toBeGreaterThanOrEqual(result.body[1].score);
     expect(status).toBe(200);
   });
 });
