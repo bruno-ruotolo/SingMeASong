@@ -84,15 +84,6 @@ describe("POST /recommendations/:id/upvote SUITE", () => {
     expect(createdUpVote.score).toBeGreaterThan(0);
     expect(status).toBe(200);
   });
-
-  it("given a invalid id, return 404", async () => {
-    const id = Math.floor(Math.random() * 100);
-
-    const result = await agent.get(`/recommendations/${id}/upvote`);
-    const status = result.statusCode;
-
-    expect(status).toBe(404);
-  });
 });
 
 describe("POST /recommendations/:id/downvote SUITE", () => {
@@ -107,15 +98,6 @@ describe("POST /recommendations/:id/downvote SUITE", () => {
 
     expect(createdUpVote.score).toBeLessThan(0);
     expect(status).toBe(200);
-  });
-
-  it("given a invalid id, return 404", async () => {
-    const id = Math.floor(Math.random() * 100);
-
-    const result = await agent.get(`/recommendations/${id}/upvote`);
-    const status = result.statusCode;
-
-    expect(status).toBe(404);
   });
 
   it("given a valid id and score less then -5, return 200 and remove recommendation", async () => {
@@ -156,22 +138,14 @@ describe("GET /recommendations/:id", () => {
     expect(result.body.name).toBe(recommendation.name);
     expect(status).toBe(200);
   });
-
-  it("given a invalid id, return 404", async () => {
-    const id = Math.floor(Math.random() * 100);
-
-    const result = await agent.get(`/recommendations/${id}`);
-    const status = result.statusCode;
-
-    expect(result).toBeNull;
-    expect(status).toBe(404);
-  });
 });
 
 describe("GET /recommendations/top/:amount", () => {
   it("return 200 and the top {amount} recommendations", async () => {
     const AMOUNT = 5;
-    await scenarioFactory.getAmountAndRandomScenario();
+    const RECOMMENDATION_QUANTITY = 15;
+    const MAX_SCORE = 200;
+    await scenarioFactory.getAmountAndRandomScenario(RECOMMENDATION_QUANTITY, MAX_SCORE);
 
     const result = await agent.get(`/recommendations/top/${AMOUNT}`);
     const status = result.statusCode;
@@ -184,7 +158,9 @@ describe("GET /recommendations/top/:amount", () => {
 
 describe("GET /recommendations/random", () => {
   it("return 200 and a object", async () => {
-    await scenarioFactory.getAmountAndRandomScenario();
+    const RECOMMENDATION_QUANTITY = 15;
+    const MAX_SCORE = 200;
+    await scenarioFactory.getAmountAndRandomScenario(RECOMMENDATION_QUANTITY, MAX_SCORE);
 
     const result = await agent.get(`/recommendations/random`);
     const status = result.statusCode;

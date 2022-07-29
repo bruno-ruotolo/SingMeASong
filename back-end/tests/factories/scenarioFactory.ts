@@ -30,12 +30,14 @@ async function getAllRecommendationScenario() {
   };
 };
 
-async function getAmountAndRandomScenario() {
-  for (let i = 0; i <= 15; i++) {
+async function getAmountAndRandomScenario(QUANTITY: number, MAX_SCORE: number) {
+  const recommendationArr = [];
+  for (let i = 0; i <= QUANTITY; i++) {
     const recommendationBody = recommendationsFactory.createBody();
-    const score = Math.floor(Math.random() * 200);
-    await prisma.recommendation.create({ data: { ...recommendationBody, score } });
+    const score = Math.floor(Math.random() * MAX_SCORE);
+    recommendationArr.push({ ...recommendationBody, score });
   };
+  await prisma.recommendation.createMany({ data: recommendationArr });
 };
 
 const scenarioFactory = {
