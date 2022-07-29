@@ -4,6 +4,7 @@ import { recommendationRepository } from "../../src/repositories/recommendationR
 import { recommendationService } from "../../src/services/recommendationsService.js";
 import { conflictError, notFoundError } from "../../src/utils/errorUtils.js";
 import recommendationsFactory from "../factories/recommendationsFactory.js";
+import scenarioFactory from "../factories/scenarioFactory.js";
 
 jest.mock("../../src/repositories/recommendationRepository.js");
 
@@ -89,10 +90,10 @@ describe("Downvote Recommendation Unit Test Suite", () => {
     const ID = 1;
 
     jest.spyOn(recommendationRepository, "find").mockImplementationOnce((): any => {
-      return { id: 1, ...recommendation, score: 0 }
+      return { id: ID, ...recommendation, score: 0 }
     });
     jest.spyOn(recommendationRepository, "updateScore").mockImplementationOnce((): any => {
-      return { id: 1, ...recommendation, score: -6 }
+      return { id: ID, ...recommendation, score: -6 }
     });
     jest.spyOn(recommendationRepository, "remove").mockImplementationOnce((): any => { });
 
@@ -119,5 +120,70 @@ describe("Get Top Recommedations Unit Test Suite", () => {
 
     await recommendationService.getTop(AMOUNT);
     expect(recommendationRepository.getAmountByScore).toHaveBeenCalled();
+  });
+});
+
+describe("Get Random Recommedations Unit Test Suite", () => {
+  it("should call getAmountByScore findAll with differents percentages and greater than 10", async () => {
+    const recommendationArr = scenarioFactory.returnRecommendationArrScenario(10, -5, 50);
+
+    jest.spyOn(recommendationRepository, "findAll").mockImplementationOnce((): any => {
+      return recommendationArr;
+    });
+
+    jest.spyOn(Math, "random").mockImplementationOnce(() => { return 0.8 })
+
+    const recommendation = await recommendationService.getRandom();
+    expect(recommendationRepository.findAll).toHaveBeenCalled();
+    expect(recommendation).not.toBeNull;
+    expect(recommendation).not.toBeUndefined;
+  });
+
+  it("should call getAmountByScore findAll with differents percentages and less than or equal 10", async () => {
+    const recommendationArr = scenarioFactory.returnRecommendationArrScenario(10, -5, 50);
+
+    jest.spyOn(recommendationRepository, "findAll").mockImplementationOnce((): any => {
+      return recommendationArr;
+    });
+    jest.spyOn(Math, "random").mockImplementationOnce(() => { return 0.4 })
+
+    const recommendation = await recommendationService.getRandom();
+    expect(recommendationRepository.findAll).toHaveBeenCalled();
+    expect(recommendation).not.toBeNull;
+    expect(recommendation).not.toBeUndefined;
+  });
+
+  it("Don't have recommendations, should throw an error", async () => {
+    jest.spyOn(recommendationRepository, "findAll").mockImplementationOnce((): any => { return [] });
+    jest.spyOn(recommendationRepository, "findAll").mockImplementationOnce((): any => { return [] });
+
+    const promise = recommendationService.getRandom();
+    expect(recommendationRepository.findAll).toHaveBeenCalled();
+    expect(promise).rejects.toEqual(notFoundError());
+  });
+
+  it("all recommentions is less or greater than 10, should call findAll", async () => {
+    const recommendationArr = scenarioFactory.returnRecommendationArrScenario(10, -5, 50);
+    jest.spyOn(recommendationRepository, "findAll").mockImplementationOnce((): any => { return [] });
+    jest.spyOn(recommendationRepository, "findAll").mockImplementationOnce((): any => {
+      return recommendationArr
+    });
+
+    const recommendation = await recommendationService.getRandom();
+    expect(recommendationRepository.findAll).toHaveBeenCalled();
+    expect(recommendation).not.toBeNull;
+    expect(recommendation).not.toBeUndefined;
+  });
+});
+
+describe("Delete All Recomendation Unit Test Suite", () => {
+  it("should call deleteAllRecommendation", async () => {
+    jest.spyOn(recommendationRepository, "deleteAllRecommendation")
+      .mockImplementationOnce((): any => { });
+
+    await recommendationService.deleteAllRecommendation();
+
+    expect(recommendationRepository.deleteAllRecommendation).toHaveBeenCalled();
+
   });
 });

@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import { prisma } from "../../src/database.js";
 import { CreateRecommendationData } from "../../src/services/recommendationsService.js";
 
@@ -40,12 +41,28 @@ async function getAmountAndRandomScenario(QUANTITY: number, MAX_SCORE: number) {
   await prisma.recommendation.createMany({ data: recommendationArr });
 };
 
+function returnRecommendationArrScenario(ARRAY_SIZE: number, MIN_VALUE: number, MAX_VALUE: number) {
+  const recommendationArr = [];
+  for (let i = 0; i <= ARRAY_SIZE; i++) {
+    recommendationArr.push(
+      {
+        id: faker.datatype.number({ min: 1, max: ARRAY_SIZE }),
+        name: faker.music.songName(),
+        youtubeLink: "https://www.youtube.com/watch?v=aBkTkxKDduc",
+        score: faker.datatype.number({ min: MIN_VALUE, max: MAX_VALUE })
+      }
+    );
+  };
+  return recommendationArr;
+};
+
 const scenarioFactory = {
   deleteAllData,
   upVoteAndGetByIdScenario,
   downVoteScenario,
   getAllRecommendationScenario,
   getAmountAndRandomScenario,
-  repeatedRecommendationScenario
+  repeatedRecommendationScenario,
+  returnRecommendationArrScenario
 };
 export default scenarioFactory;

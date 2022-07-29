@@ -8,7 +8,7 @@ function createBody() {
 };
 
 const recommendationsFactory = {
-  createBody
+  createBody,
 };
 
 export default recommendationsFactory;
