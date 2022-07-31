@@ -49,25 +49,41 @@ describe('Navigate Through Menu Pages', () => {
   });
 
   it('should navigate to top', () => {
+    cy.intercept('GET', '/recommendations').as('getRecommendationHome');
     cy.visit(`${URL}/`);
+    cy.wait('@getRecommendationHome');
 
+    cy.intercept('GET', '/recommendations/top/10').as('getTopRecommendations');
     cy.contains('Top').click();
+    cy.wait('@getTopRecommendations');
+
+    cy.get(`article`).should('have.length.greaterThan', 0);
+    cy.get(`article`).should('have.length.lte', 10);
 
     cy.contains(`${recommendation.name}`).should('exist');
+
     cy.url().should('equal', `${URL}/top`);
   });
 
   it('should navigate to random', () => {
+    cy.intercept('GET', '/recommendations').as('getRecommendationHome');
     cy.visit(`${URL}/`);
+    cy.wait('@getRecommendationHome');
 
+    cy.intercept('GET', '/recommendations/random').as('getRandomRecommendation');
     cy.contains('Random').click();
+    cy.wait('@getRandomRecommendation');
+
+    cy.get(`article`).should('have.length', 1);
 
     cy.contains(`${recommendation.name}`).should('exist');
     cy.url().should('equal', `${URL}/random`);
   });
 
   it('should navigate to home', () => {
+    cy.intercept('GET', '/recommendations').as('getRecommendationHome');
     cy.visit(`${URL}/`);
+    cy.wait('@getRecommendationHome');
 
     cy.contains('Home').click();
 
