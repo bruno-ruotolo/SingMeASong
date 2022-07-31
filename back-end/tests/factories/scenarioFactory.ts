@@ -24,16 +24,9 @@ async function downVoteScenario(score = 0) {
   return await prisma.recommendation.create({ data: { ...recommendationBody, score } });
 };
 
-async function getAllRecommendationScenario() {
-  for (let i = 0; i <= 15; i++) {
-    const recommendationBody = recommendationsFactory.createBody();
-    await prisma.recommendation.create({ data: recommendationBody });
-  };
-};
-
-async function getAmountAndRandomScenario(QUANTITY: number, MAX_SCORE: number) {
+async function createSeveralRecommendationsScenario(QUANTITY: number, MAX_SCORE: number) {
   const recommendationArr = [];
-  for (let i = 0; i <= QUANTITY; i++) {
+  for (let i = 0; i < QUANTITY; i++) {
     const recommendationBody = recommendationsFactory.createBody();
     const score = Math.floor(Math.random() * MAX_SCORE);
     recommendationArr.push({ ...recommendationBody, score });
@@ -60,9 +53,9 @@ const scenarioFactory = {
   deleteAllData,
   upVoteAndGetByIdScenario,
   downVoteScenario,
-  getAllRecommendationScenario,
-  getAmountAndRandomScenario,
+  createSeveralRecommendationsScenario,
   repeatedRecommendationScenario,
   returnRecommendationArrScenario
 };
+
 export default scenarioFactory;

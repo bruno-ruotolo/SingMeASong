@@ -7,6 +7,8 @@ import recommendationsFactory from "../factories/recommendationsFactory.js";
 import scenarioFactory from "../factories/scenarioFactory.js";
 
 jest.mock("../../src/repositories/recommendationRepository.js");
+jest.clearAllMocks();
+jest.resetAllMocks();
 
 describe("Create Recommendation Unit Test Suite", () => {
   it("given a valid recommendation, should call create", async () => {
@@ -38,7 +40,7 @@ describe("Upvote Recommendation Unit Test Suite", () => {
     const ID = 1;
 
     jest.spyOn(recommendationRepository, "find").mockImplementationOnce((): any => {
-      return { id: 1, ...recommendation, score: 0 }
+      return { id: 1, ...recommendation, score: 0 };
     });
 
     jest.spyOn(recommendationRepository, "updateScore").mockImplementationOnce((): any => { });
@@ -64,11 +66,11 @@ describe("Downvote Recommendation Unit Test Suite", () => {
     const ID = 1;
 
     jest.spyOn(recommendationRepository, "find").mockImplementationOnce((): any => {
-      return { id: 1, ...recommendation, score: 0 }
+      return { id: 1, ...recommendation, score: 0 };
     });
 
     jest.spyOn(recommendationRepository, "updateScore").mockImplementationOnce((): any => {
-      return { id: 1, ...recommendation, score: 0 }
+      return { id: 1, ...recommendation, score: 0 };
     });
 
     await recommendationService.downvote(ID);
@@ -90,10 +92,10 @@ describe("Downvote Recommendation Unit Test Suite", () => {
     const ID = 1;
 
     jest.spyOn(recommendationRepository, "find").mockImplementationOnce((): any => {
-      return { id: ID, ...recommendation, score: 0 }
+      return { id: ID, ...recommendation, score: 0 };
     });
     jest.spyOn(recommendationRepository, "updateScore").mockImplementationOnce((): any => {
-      return { id: ID, ...recommendation, score: -6 }
+      return { id: ID, ...recommendation, score: -6 };
     });
     jest.spyOn(recommendationRepository, "remove").mockImplementationOnce((): any => { });
 
@@ -131,12 +133,12 @@ describe("Get Random Recommedations Unit Test Suite", () => {
       return recommendationArr;
     });
 
-    jest.spyOn(Math, "random").mockImplementationOnce(() => { return 0.8 })
+    jest.spyOn(Math, "random").mockImplementationOnce(() => { return 0.8 });
 
     const recommendation = await recommendationService.getRandom();
     expect(recommendationRepository.findAll).toHaveBeenCalled();
-    expect(recommendation).not.toBeNull;
-    expect(recommendation).not.toBeUndefined;
+    expect(recommendation).not.toBeNull();
+    expect(recommendation).not.toBeUndefined();
   });
 
   it("should call getAmountByScore findAll with differents percentages and less than or equal 10", async () => {
@@ -145,12 +147,12 @@ describe("Get Random Recommedations Unit Test Suite", () => {
     jest.spyOn(recommendationRepository, "findAll").mockImplementationOnce((): any => {
       return recommendationArr;
     });
-    jest.spyOn(Math, "random").mockImplementationOnce(() => { return 0.4 })
+    jest.spyOn(Math, "random").mockImplementationOnce(() => { return 0.4 });
 
     const recommendation = await recommendationService.getRandom();
     expect(recommendationRepository.findAll).toHaveBeenCalled();
-    expect(recommendation).not.toBeNull;
-    expect(recommendation).not.toBeUndefined;
+    expect(recommendation).not.toBeNull();
+    expect(recommendation).not.toBeUndefined();
   });
 
   it("Don't have recommendations, should throw an error", async () => {
@@ -166,13 +168,13 @@ describe("Get Random Recommedations Unit Test Suite", () => {
     const recommendationArr = scenarioFactory.returnRecommendationArrScenario(10, -5, 50);
     jest.spyOn(recommendationRepository, "findAll").mockImplementationOnce((): any => { return [] });
     jest.spyOn(recommendationRepository, "findAll").mockImplementationOnce((): any => {
-      return recommendationArr
+      return recommendationArr;
     });
 
     const recommendation = await recommendationService.getRandom();
     expect(recommendationRepository.findAll).toHaveBeenCalled();
-    expect(recommendation).not.toBeNull;
-    expect(recommendation).not.toBeUndefined;
+    expect(recommendation).not.toBeNull();
+    expect(recommendation).not.toBeUndefined();
   });
 });
 
@@ -184,6 +186,5 @@ describe("Delete All Recomendation Unit Test Suite", () => {
     await recommendationService.deleteAllRecommendation();
 
     expect(recommendationRepository.deleteAllRecommendation).toHaveBeenCalled();
-
   });
 });

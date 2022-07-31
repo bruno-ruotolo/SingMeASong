@@ -12,24 +12,32 @@ describe('Create Recommendation Test Suite ', () => {
 
   beforeEach(() => {
     cy.resetRecommendation();
-    cy.createRecommendation(recommendation)
+    cy.createRecommendation(recommendation);
   });
 
   it("should increase upvote number on click", () => {
-    cy.visit(`${URL}/`)
+    cy.visit(`${URL}/`);
 
     cy.get('#upvote').click();
 
     cy.get('#score').should('contain', `1`);
   });
 
-
   it("should increase downvote number on click", () => {
-    cy.visit(`${URL}/`)
+    cy.visit(`${URL}/`);
 
     cy.get('#downvote').click();
 
     cy.get('#score').should('contain', `-1`);
   });
 
+  it("should increase downvote number to -5 and disappear", () => {
+    cy.visit(`${URL}/`);
+
+    for (let i = 0; i <= 5; i++) {
+      cy.get('#downvote').click();
+    };
+
+    cy.get('#player').should('not.exist');
+  });
 });

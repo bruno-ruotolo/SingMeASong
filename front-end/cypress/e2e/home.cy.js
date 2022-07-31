@@ -8,7 +8,6 @@ beforeEach(() => {
   cy.resetRecommendation();
 });
 
-
 describe('Create Recommendation Test Suite ', () => {
   const recommendation = {
     name: faker.music.songName(),
@@ -25,6 +24,17 @@ describe('Create Recommendation Test Suite ', () => {
     cy.wait('@recommendation');
 
     cy.contains(`${recommendation.name}`).should('exist');
+  });
+
+  it('should not create recommendation', () => {
+    cy.visit(`${URL}/`);
+    cy.get('[placeholder*="Name"]').type(recommendation.name);
+
+    cy.intercept("POST", "/recommendations").as("recommendation");
+    cy.get('#createButtom').click();
+    cy.wait('@recommendation');
+
+    cy.contains(`${recommendation.name}`).should('not.exist');
   });
 });
 

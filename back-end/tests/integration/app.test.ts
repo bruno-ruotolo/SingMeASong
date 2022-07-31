@@ -22,8 +22,8 @@ describe("POST /recommendations Suite", () => {
       where: { name: recommendationBody.name, youtubeLink: recommendationBody.youtubeLink }
     });
 
-    expect(createdRecommendation).not.toBeNull;
-    expect(createdRecommendation).not.toBeUndefined;
+    expect(createdRecommendation).not.toBeNull();
+    expect(createdRecommendation).not.toBeUndefined();
     expect(status).toBe(201);
   });
 
@@ -37,7 +37,7 @@ describe("POST /recommendations Suite", () => {
       where: { name: recommendationBody.name, youtubeLink: recommendationBody.youtubeLink }
     });
 
-    expect(createdRecommendation).toBeNull;
+    expect(createdRecommendation).toBeNull();
     expect(status).toBe(422);
   });
 
@@ -51,7 +51,7 @@ describe("POST /recommendations Suite", () => {
       where: { name: recommendationBody.name, youtubeLink: recommendationBody.youtubeLink }
     });
 
-    expect(createdRecommendation).toBeNull;
+    expect(createdRecommendation).toBeNull();
     expect(status).toBe(422);
   });
 
@@ -84,6 +84,15 @@ describe("POST /recommendations/:id/upvote SUITE", () => {
     expect(createdUpVote.score).toBeGreaterThan(0);
     expect(status).toBe(200);
   });
+
+  it("given a invalid id, return 404", async () => {
+    const id = Math.floor(Math.random() * 100);
+
+    const result = await agent.get(`/recommendations/${id}/upvote`);
+    const status = result.statusCode;
+
+    expect(status).toBe(404);
+  });
 });
 
 describe("POST /recommendations/:id/downvote SUITE", () => {
@@ -100,7 +109,16 @@ describe("POST /recommendations/:id/downvote SUITE", () => {
     expect(status).toBe(200);
   });
 
-  it("given a valid id and score less then -5, return 200 and remove recommendation", async () => {
+  it("given a invalid id, return 404", async () => {
+    const id = Math.floor(Math.random() * 100);
+
+    const result = await agent.get(`/recommendations/${id}/downvote`);
+    const status = result.statusCode;
+
+    expect(status).toBe(404);
+  });
+
+  it("given a valid id and score less than -5, return 200 and remove recommendation", async () => {
     const recommendation = await scenarioFactory.downVoteScenario(-5);
     const { id } = recommendation;
 
@@ -115,14 +133,35 @@ describe("POST /recommendations/:id/downvote SUITE", () => {
 });
 
 describe("GET /recommendations", () => {
-  it("return 200 and the last 10 recommendations", async () => {
-    await scenarioFactory.getAllRecommendationScenario();
+  it("if quantity more than 10, return 200 and the last 10 recommendations", async () => {
+    const RECOMMENDATION_QUANTITY = 20;
+    const MAX_SCORE = 200;
+    await scenarioFactory.createSeveralRecommendationsScenario(RECOMMENDATION_QUANTITY, MAX_SCORE);
 
     const result = await agent.get(`/recommendations`);
     const status = result.statusCode;
 
     expect(result.body).toHaveLength(10);
-    console.log("🚀 ~ file: app.test.ts ~ line 143 ~ it ~ result.body", result.body)
+    expect(result.body[0].id).toBeTruthy();
+    expect(result.body[0].name).toBeTruthy();
+    expect(result.body[0].youtubeLink).toBeTruthy();
+    expect(result.body[0].score).toBeTruthy();
+    expect(status).toBe(200);
+  });
+
+  it("if quantity less than 10, return 200 and the last {QUANTITY} recommendations", async () => {
+    const RECOMMENDATION_QUANTITY = 5;
+    const MAX_SCORE = 200;
+    await scenarioFactory.createSeveralRecommendationsScenario(RECOMMENDATION_QUANTITY, MAX_SCORE);
+
+    const result = await agent.get(`/recommendations`);
+    const status = result.statusCode;
+
+    expect(result.body).toHaveLength(RECOMMENDATION_QUANTITY);
+    expect(result.body[0].id).toBeTruthy();
+    expect(result.body[0].name).toBeTruthy();
+    expect(result.body[0].youtubeLink).toBeTruthy();
+    expect(result.body[0].score).toBeTruthy();
     expect(status).toBe(200);
   });
 });
@@ -135,24 +174,21 @@ describe("GET /recommendations/:id", () => {
     const result = await agent.get(`/recommendations/${id}`);
     const status = result.statusCode;
 
+    expect(result.body.id).toBe(recommendation.id);
     expect(result.body.name).toBe(recommendation.name);
+    expect(result.body.youtubeLink).toBe(recommendation.youtubeLink);
+    expect(result.body.score).toBe(recommendation.score);
     expect(status).toBe(200);
   });
-});
 
-describe("GET /recommendations/top/:amount", () => {
-  it("return 200 and the top {amount} recommendations", async () => {
-    const AMOUNT = 5;
-    const RECOMMENDATION_QUANTITY = 15;
-    const MAX_SCORE = 200;
-    await scenarioFactory.getAmountAndRandomScenario(RECOMMENDATION_QUANTITY, MAX_SCORE);
+  it("given a invalid id, return 404", async () => {
+    const id = Math.floor(Math.random() * 100);
 
-    const result = await agent.get(`/recommendations/top/${AMOUNT}`);
+    const result = await agent.get(`/recommendations/${id}`);
     const status = result.statusCode;
 
-    expect(result.body).toHaveLength(AMOUNT);
-    expect(result.body[0].score).toBeGreaterThanOrEqual(result.body[1].score);
-    expect(status).toBe(200);
+    expect(result).toBeNull;
+    expect(status).toBe(404);
   });
 });
 
@@ -160,12 +196,56 @@ describe("GET /recommendations/random", () => {
   it("return 200 and a object", async () => {
     const RECOMMENDATION_QUANTITY = 15;
     const MAX_SCORE = 200;
-    await scenarioFactory.getAmountAndRandomScenario(RECOMMENDATION_QUANTITY, MAX_SCORE);
+    await scenarioFactory.createSeveralRecommendationsScenario(RECOMMENDATION_QUANTITY, MAX_SCORE);
 
     const result = await agent.get(`/recommendations/random`);
     const status = result.statusCode;
 
     expect(result).not.toBeNull();
+    expect(result.body.id).toBeTruthy();
+    expect(result.body.name).toBeTruthy();
+    expect(result.body.youtubeLink).toBeTruthy();
+    expect(result.body.score).toBeTruthy();
+    expect(status).toBe(200);
+  });
+});
+
+describe("GET /recommendations/top/:amount", () => {
+  it("if AMOUNT < RECOMMENDATION_QUANTITY, return 200 and the top {amount} recommendations", async () => {
+    const AMOUNT = 5;
+    const RECOMMENDATION_QUANTITY = 15;
+    const MAX_SCORE = 200;
+    await scenarioFactory.createSeveralRecommendationsScenario(RECOMMENDATION_QUANTITY, MAX_SCORE);
+
+    const result = await agent.get(`/recommendations/top/${AMOUNT}`);
+    const status = result.statusCode;
+
+    expect(result.body).toHaveLength(AMOUNT);
+    expect(result.body[0].id).toBeTruthy();
+    expect(result.body[0].name).toBeTruthy();
+    expect(result.body[0].youtubeLink).toBeTruthy();
+    expect(result.body[0].score).toBeTruthy();
+    expect(result.body[0].score).toBeGreaterThanOrEqual(result.body[1].score);
+    expect(result.body[1].score).toBeGreaterThanOrEqual(result.body[2].score);
+    expect(status).toBe(200);
+  });
+
+  it("if AMOUNT > RECOMMENDATION_QUANTITY, return 200 and the top {RECOMMENDATION_QUANTITY}", async () => {
+    const AMOUNT = 10;
+    const RECOMMENDATION_QUANTITY = 5;
+    const MAX_SCORE = 200;
+    await scenarioFactory.createSeveralRecommendationsScenario(RECOMMENDATION_QUANTITY, MAX_SCORE);
+
+    const result = await agent.get(`/recommendations/top/${AMOUNT}`);
+    const status = result.statusCode;
+
+    expect(result.body).toHaveLength(RECOMMENDATION_QUANTITY);
+    expect(result.body[0].id).toBeTruthy();
+    expect(result.body[0].name).toBeTruthy();
+    expect(result.body[0].youtubeLink).toBeTruthy();
+    expect(result.body[0].score).toBeTruthy();
+    expect(result.body[0].score).toBeGreaterThanOrEqual(result.body[1].score);
+    expect(result.body[1].score).toBeGreaterThanOrEqual(result.body[2].score);
     expect(status).toBe(200);
   });
 });
