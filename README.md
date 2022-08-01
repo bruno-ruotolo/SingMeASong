@@ -48,379 +48,66 @@ Also navigate to the back-end folder and run the same command:
 npm i
 ```
 
-Finally, you're able to run the tests
+You must to create a `.env` and `.env.test`, using the `.envExample` as example
 
-Use the Prisma Migrations to create your database:
+Use the Prisma Migrations to create your main database:
 
 ```git
 npm prisma migrate dev
 ```
 
+Finally, you're able to run the tests
+
 # Tests Reference
 
 Here you can check the tests related to the project and how to run it. Have Fun 😄
 
-## Routes
-### Authentication Routes
+## Back-End Tests
+### Integration Tests
 
-#### Register
-   - POST _/sign-up_
+To run the integration tests you must first create your test database, but if you already configured the `.env.test`, just run the following command:
 
-   - Body  
-```json
-{
-  "email": "user@myemail.com",
-  "password": "mypassword" // >= 10 char
-}
+```js
+npm run test
 ```
 
+This will create your test database with the prisma schemas and run all the tests (integration and unit)
+### Unit Tests
 
-#### Login
-- POST _/_
+To run the unit tests you must acess the back-end folder and run the following command: 
 
-- Body
-```json
-{
-  "email": "user@myemail.com",
-  "password": "mypassword"
-}
-```
----
-
-### Websites Credentials Routes
-
-#### Create Credential
-- POST _/credentials_
-
-- Header
-```json
-{
-    "Authorization" : "Bearer <token>"
-}
-``` 
-
-- Body
-```json
-{
-    "title":"My Title",
-    "url":"https://www.myemail.com",
-    "username":"user",
-    "password": "mypassword"
-}
+```js
+npm run test:unit
 ```
 
+This will run only the unit tests for the `recommendationService` file.
 
-#### Get All My Credentials
-- GET _/credentials_
+## Front-End and Back-End Tests
+### End-2-End Tests
 
-- Header
-```json
-{
-    "Authorization" : "Bearer <token>"
-}
-``` 
+To run the E2E tests you must first acesse the back-end folde and host your back-end test server, using: 
 
-- Response
-```json
-[
-    {
-        "id": 0
-        "userId": 0,
-        "title":"My Title",
-        "url":"https://www.myemail.com",
-        "username":"user",
-        "password": "mypassword"
-        "createdAt": "2022-07-17T16:46:42.056Z"
-    }
-] {...}
+```js
+npm run dev:test
 ```
 
-#### Get Credential By ID
-- GET _/credentials/:id_
+Then you have to run the react app, at the front-end folder:
 
-- Header
-```json
-{
-    "Authorization" : "Bearer <token>"
-}
-``` 
-
-- Response
-```json
-{
-    "id": 0
-    "userId": 0,
-    "title":"My Title",
-    "url":"https://www.myemail.com",
-    "username":"user",
-    "password": "mypassword"
-    "createdAt": "2022-07-17T16:46:42.056Z"
-}
+```js
+npm start
 ```
 
+Then you have to run the react app at the front-end folder:
 
-#### Delete Credential By ID
-- DELETE _/credentials/:id_
-
-- Header
-```json
-{
-    "Authorization" : "Bearer <token>"
-}
-``` 
-
----
-
-### Secure Notes Routes
-
-#### Create Secure Notes
-- POST _/secure-notes_
-
-- Header
-```json
-{
-    "Authorization" : "Bearer <token>"
-}
-``` 
-
-- Body
-```json
-{
-    "title":"My Title",
-    "note" : "My Note"
-}
+```js
+npm start
 ```
 
+Finally you can open the cypress interface and execute the E2E tests in there: 
 
-#### Get All My Secure Notes
-- GET _/secure-notes_
-
-- Header
-```json
-{
-    "Authorization" : "Bearer <token>"
-}
-``` 
-
-- Response
-```json
-[
-  {
-    "id": 0,
-    "userId": 0,
-    "title": "My Title",
-    "note": "My Note",
-    "createdAt": "2022-07-17T16:47:19.507Z"
-  }
-] {...}
+```js
+npx cypress open
 ```
-
-#### Get Secure Notes By ID
-- GET _/secure-notes/:id_
-
-- Header
-```json
-{
-    "Authorization" : "Bearer <token>"
-}
-``` 
-
-- Response
-```json
-{
-    "id": 0,
-    "userId": 0,
-    "title": "My Title",
-    "note": "My Note",
-    "createdAt": "2022-07-17T16:47:19.507Z"
-}
-```
-
-
-#### Delete Secure Notes By ID
-- DELETE _/secure-notes/:id_
-
-- Header
-```json
-{
-    "Authorization" : "Bearer <token>"
-}
-``` 
-
----
-
-### Cards Routes
-
-#### Create Cards
-- POST _/cards_
-
-- Header
-```json
-{
-    "Authorization" : "Bearer <token>"
-}
-``` 
-
-- Body
-```json
-{
-  "title":"My Title",
-  "number":"0000000000000000",
-  "name":"USER U USERS",
-  "cvv":"000",
-  "expirationDate":"12/22",
-  "password":"0000",
-  "isVirtual":true, //true or false
-  "type":"debit" //"credit", "debit", "both"
-}
-```
-
-#### Get All My Cards
-- GET _/cards_
-
-- Header
-```json
-{
-    "Authorization" : "Bearer <token>"
-}
-``` 
-
-- Response
-```json
-[
-  {
-    "id": 0,
-    "userId": 0,
-    "title": "My Title",
-    "number": "0000000000000000",
-    "name": "USER U USERS",
-    "cvv": "000",
-    "expirationDate": "12/22",
-    "password": "0000",
-    "isVirtual": true,
-    "type": "debit",
-    "createdAt": "2022-07-17T16:47:19.507Z"
-  }
-] {...}
-```
-
-#### Get Card By ID
-- GET _/cards/:id_
-
-- Header
-```json
-{
-    "Authorization" : "Bearer <token>"
-}
-``` 
-
-- Response
-```json
-{
-    "id": 0,
-    "userId": 0,
-    "title": "My Title",
-    "number": "0000000000000000",
-    "name": "USER U USERS",
-    "cvv": "000",
-    "expirationDate": "12/22",
-    "password": "0000",
-    "isVirtual": true,
-    "type": "debit",
-    "createdAt": "2022-07-17T16:47:19.507Z"
-}
-```
-
-
-#### Delete Card By ID
-- DELETE _/cards/:id_
-
-- Header
-```json
-{
-    "Authorization" : "Bearer <token>"
-}
-``` 
-
----
-
-### WIFI Credentials Routes
-
-#### Create WIFI 
-- POST _/wifi_
-
-- Header
-```json
-{
-    "Authorization" : "Bearer <token>"
-}
-``` 
-
-- Body
-```json
-{
-  "title":"My Title",
-  "name":"USER WIFI",
-  "password":"000000",
-}
-```
-
-#### Get All My WIFIs
-- GET _/wifi_
-
-- Header
-```json
-{
-    "Authorization" : "Bearer <token>"
-}
-``` 
-
-- Response
-```json
-[
-  {
-    "id": 0,
-    "userId": 0,
-    "title": "My Title",
-    "name":"USER WIFI",
-    "password":"000000",
-    "createdAt": "2022-07-17T16:47:19.507Z"
-  }
-] {...}
-```
-
-#### Get WIFI By ID
-- GET _/wifi/:id_
-
-- Header
-```json
-{
-    "Authorization" : "Bearer <token>"
-}
-``` 
-
-- Response
-```json
-{
-    "id": 0,
-    "userId": 0,
-    "title": "My Title",
-    "name":"USER WIFI",
-    "password":"000000",
-    "createdAt": "2022-07-17T16:47:19.507Z"
-}
-```
-
-
-#### Delete WIFI By ID
-- DELETE _/wifi/:id_
-
-- Header
-```json
-{
-    "Authorization" : "Bearer <token>"
-}
-``` 
 
 ## Authors
 ### Bruno Ruotolo
