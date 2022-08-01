@@ -71,27 +71,21 @@ This will create your test database with the prisma schemas and run all the test
 
 ### Unit Tests
 
-To run the unit tests you must acess the back-end folder and run the following command: 
+To run the unit tests you must access the back-end folder and run the following command: 
 
 ```js
 npm run test:unit
 ```
 
-This will run only the unit tests for the `recommendationService` file.
+This will only run the unit tests for the `recommendationService` file.
 
 ## Front-End and Back-End Tests
 ### End-2-End Tests
 
-To run the E2E tests you must first acesse the back-end folde and host your back-end test server, using: 
+To run the E2E tests you must first access the back-end folder and host your back-end test server, using: 
 
 ```js
 npm run dev:test
-```
-
-Then you have to run the react app, at the front-end folder:
-
-```js
-npm start
 ```
 
 Then you have to run the react app at the front-end folder:
