@@ -1,6 +1,6 @@
 <br />
 <div align="center">
-    <img src="./.github/singmeasong.png" alt="Sing Me A Song Logo" width="150">
+    <img src="./.github/SingMeASong.png" alt="Sing Me A Song Logo" width="150">
     <h3 align="center">Sing Me A Song</h3>
     <p> A Test Aimed Project
 </div>
